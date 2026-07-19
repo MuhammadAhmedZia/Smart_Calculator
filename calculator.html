@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ur">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditional Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+        }
+
+        .calculator-card h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #007bff;
+        }
+
+        .operations-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .op-btn {
+            background-color: #f8f9fa;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .op-btn:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        .op-btn:active {
+            transform: scale(0.95);
+        }
+
+        .output-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-empty {
+            background-color: #f8f9fa;
+            color: #666;
+            border: 1px dashed #ccc;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .rules-list {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .rules-list ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator-card">
+        <h2>Smart Calculator</h2>
+
+        <!-- Input 1 -->
+        <div class="input-group">
+            <label for="value1">First Value</label>
+            <input type="number" id="value1" placeholder="Enter first number" step="any">
+        </div>
+
+        <!-- Input 2 -->
+        <div class="input-group">
+            <label for="value2">Second Value</label>
+            <input type="number" id="value2" placeholder="Enter second number" step="any">
+        </div>
+
+        <!-- Operation Buttons -->
+        <div class="operations-grid">
+            <button class="op-btn" onclick="calculator('+')">+</button>
+            <button class="op-btn" onclick="calculator('-')">−</button>
+            <button class="op-btn" onclick="calculator('*')">×</button>
+            <button class="op-btn" onclick="calculator('/')">÷</button>
+            <button class="op-btn" onclick="clearDisplay()">c</button>
+        </div>
+
+        <!-- Result / Error Display Box -->
+        <div id="output" class="output-box status-empty">
+            Result will be displayed here
+        </div>
+
+        <!-- Rules Info for User Guidance -->
+        <div class="rules-list">
+            <strong>Calculator Rules:</strong>
+            <ul>
+                <li>First value must be greater than or equal to Second value.</li>
+                <li>Only numeric values are allowed.</li>
+                <li>First value cannot be divided by zero.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function calculator(operator) {
+            const input1 = document.getElementById('value1').value.trim();
+            const input2 = document.getElementById('value2').value.trim();
+            const outputBox = document.getElementById('output');
+
+            outputBox.className = 'output-box';
+
+
+            if (input1 === "" || input2 === "") {
+                outputBox.innerText = 'Error: Enter both numbers.'
+                outputBox.classList.add('status-error');
+                return
+            }
+            const val1 = parseFloat(input1);
+            const val2 = parseFloat(input2);
+
+            if ((isNaN(val1) || isNaN(val2))) {
+                outputBox.innerText = 'Error: Enter a Valid Number.'
+                outputBox.classList.add('status-error');
+                return
+            }
+
+            if (val1 < val2) {
+                outputBox.innerText = 'Error: Enter a first value greather than second value.'
+                outputBox.classList.add('status-error');
+                return
+            }
+
+            if (operator === '/' && val2 === 0) {
+                outputBox.innerText = 'Error: cannot be divided by zero.'
+                outputBox.classList.add('status-error');
+                return
+            }
+
+            let result
+            switch (operator) {
+                case '/':
+                    result = val1 / val2;
+                    break;
+                case '*':
+                    result = val1 * val2;
+                    break;
+                case '+':
+                    result = val1 + val2;
+                    break;
+                case '-':
+                    result = val1 - val2;
+                    break;
+
+                default:
+                    result = "Error: Invalid Operations"
+                    outputBox.classList.add('status-error');
+                    break;
+            }
+
+            output.innerText = "Result: " + result;
+            outputBox.classList.add('status-success');
+        }
+
+        function clearDisplay() {
+            document.getElementById('value1').value = "";
+            document.getElementById('value2').value = "";
+        }
+    </script>
+
+    <!-- <script>
+    function handleCalculation(operator) {
+        const input1 = document.getElementById('value1').value.trim();
+        const input2 = document.getElementById('value2').value.trim();
+        const outputBox = document.getElementById('output');
+
+        // Reset styling class
+        outputBox.className = 'output-box';
+
+        // 2. Condition: Only numeric value accept kry (Check if inputs are empty)
+        if (input1 === "" || input2 === "") {
+            outputBox.innerText = "Error: Please enter both numbers.";
+            outputBox.classList.add('status-error');
+            return;
+        }
+
+        const val1 = parseFloat(input1);
+        const val2 = parseFloat(input2);
+
+        // Extra check for numeric validation just in case
+        if (isNaN(val1) || isNaN(val2)) {
+            outputBox.innerText = "Error: Invalid numeric input.";
+            outputBox.classList.add('status-error');
+            return;
+        }
+
+        // 1. Condition: First value hamesha greater than equal hu second value k
+        if (val1 < val2) {
+            outputBox.innerText = "Error: First value must be greater than or equal to Second value.";
+            outputBox.classList.add('status-error');
+            return;
+        }
+
+        // 3. Condition: 1st value can't be divided by zero
+        if (operator === '/' && val2 === 0) {
+            outputBox.innerText = "Error: Cannot divide by zero.";
+            outputBox.classList.add('status-error');
+            return;
+        }
+
+        // Calculations
+        let result;
+        switch (operator) {
+            case '+':
+                result = val1 + val2;
+                break;
+            case '-':
+                result = val1 - val2;
+                break;
+            case '*':
+                result = val1 * val2;
+                break;
+            case '/':
+                result = val1 / val2;
+                break;
+            default:
+                outputBox.innerText = "Error: Invalid Operation.";
+                outputBox.classList.add('status-error');
+                return;
+        }
+
+        // Clear layout and display successful result
+        // Handling floating point precision issues using clear format (e.g. 0.1 + 0.2)
+        if (!Number.isInteger(result)) {
+            result = parseFloat(result.toFixed(4));
+        }
+        
+        outputBox.innerText = "Result: " + result;
+        outputBox.classList.add('status-success');
+    }
+</script> -->
+
+</body>
+
+</html>
